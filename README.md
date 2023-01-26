@@ -64,6 +64,16 @@ t.test();
 ## 프로바이더
 - 비즈니스 로직을 수행하는 역할
 - 서비스, 저장소, 팩토리, 헬퍼 등의 형태로 구현 가능
+- Module에서 사용할 수 있도록 등록을 해줘야함. nest cli로 자동생성했다면 바로 등록되어있음.
+
+## 모듈
+- `@Module` 데커레이터를 사용하고 인수로 ModuleMetadata를 받음
+- ModuleMetadata
+    - `import` : 현재 모듈에서 사용하기 위한 프로바이더를 가지고 있는 다른 모듈을 가지고옴. ex) 유저가 결제하여 라이센스가 생성되는 경우 - UsersModule, OrdersModule, LicensesModule
+    - `controllers / providers` : 현재 모듈 전반에서 컨트롤러와 프로바이더를 사용할 수 있도록 nest가 객체를 생성하고 주입할 수 있게 해줌
+    - `export` : 현재 모듈에서 제공하는 컴포넌트를 다른 모듈에서 import해서 쓰고자한다면 export를 해야 다른 모듈에서 사용가능
+- 가져온 모듈 다시 내보내기 가능
+- `nest g mo XXX` - XXX 모듈 생성
 
 - [관점 지향 프로그래밍 - 위키백과, 우리 모두의 백과사전](https://ko.wikipedia.org/wiki/%EA%B4%80%EC%A0%90_%EC%A7%80%ED%96%A5_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D)
 
