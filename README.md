@@ -164,6 +164,9 @@ $ migration:revert
 ## Exception
 
 
+## 정리
+![img.png](img.png)
+
 ---
 
 ## Installation
