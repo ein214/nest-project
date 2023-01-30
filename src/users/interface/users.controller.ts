@@ -3,30 +3,42 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
-  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
   Query,
-  Headers, UseGuards
-} from "@nestjs/common";
+  Headers,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserInfo } from './dto/userInfo';
 import { ValidationPipe } from '../validation.pipe';
-import { AuthService } from "../auth/auth.service";
-import { AuthGuard } from "../auth.guard";
+import { AuthService } from '../auth/auth.service';
+import { AuthGuard } from '../auth.guard';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from './command/create-user.command';
+import { GetUserInfoQuery } from "./query/get-user-info.query";
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly authService: AuthService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+    private commandBus: CommandBus,
+    private queryBus: QueryBus,
+  ) {}
 
   @Post()
   async createUser(@Body(ValidationPipe) dto: CreateUserDto): Promise<void> {
     const { name, email, password } = dto;
-    await this.usersService.createUser(name, email, password);
+
+    const command = new CreateUserCommand(name, email, password);
+
+    return this.commandBus.execute(command);
+    //await this.usersService.createUser(name, email, password);
   }
 
   @Post('/email-verify')
@@ -63,7 +75,8 @@ export class UsersController {
     @Headers() headers: any,
     @Param('id') userId: string,
   ): Promise<UserInfo> {
-    return this.usersService.getUserInfo(userId);
+    const getUserInfoQuery = new GetUserInfoQuery(userId);
+    return this.queryBus.execute(getUserInfoQuery);
   }
 
   @Get()
